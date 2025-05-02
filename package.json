@@ -1,0 +1,27 @@
+{
+  "name": "zubairmcp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js",
+    "cucumber": "cucumber-js",
+    "mcp": "npx cucumber-js",
+    "mcp:headless": "set HEADLESS=true&& npx cucumber-js",
+    "mcp:headed": "set HEADLESS=false&& npx cucumber-js",
+    "mcp:firefox": "set BROWSER=firefox&& npx cucumber-js",
+    "mcp:webkit": "set BROWSER=webkit&& npx cucumber-js",
+    "mcp:chrome": "set BROWSER=chromium&& npx cucumber-js",
+    "mcp:login": "npx cucumber-js --tags @login",
+    "mcp:slow": "set SLOW_MO=100&& npx cucumber-js",
+    "mcp:report": "npx cucumber-js --format html:report.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.2.0",
+    "playwright": "^1.52.0"
+  }
+}
