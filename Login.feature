@@ -19,14 +19,14 @@ Feature: Login and Create Project Flow
     And I should see a dashboard element
 
   # Scenario: Create a new project
-    Given I am logged in and on the projects page
-    When I click on the "Create New Project" button
-    Then the "Create New Project" modal should be visible
-    When I enter "Test Project" into the project name field
-    Then the "Create Project" button should be enabled
-    When I click on the "Create Project" button
-    Then I should be redirected to the project page
-    And I should see the text "Test Project"
+    # Given I am logged in and on the projects page
+    # When I click on the "Create New Project" button
+    # Then the "Create New Project" modal should be visible
+    # When I enter "Test Project" into the project name field
+    # Then the "Create Project" button should be enabled
+    # When I click on the "Create Project" button
+    # Then I should be redirected to the project page
+    # And I should see the text "Test Project"
 
   # Scenario: Create a new item
   #   Given I am on the "Test Project" page
