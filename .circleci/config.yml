@@ -1,0 +1,89 @@
+version: 2.1
+
+executors:
+  playwright:
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.52.0-noble
+    resource_class: medium
+
+jobs:
+  checkout-and-setup:
+    executor: playwright
+    steps:
+      - checkout
+      - run:
+          name: Verify Node.js Setup
+          command: |
+            node --version
+            npm --version
+
+  install-dependencies:
+    executor: playwright
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm ci
+
+  install-playwright:
+    executor: playwright
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - run:
+          name: Install Playwright
+          command: npx playwright install --with-deps
+
+  install-mcp-server:
+    executor: playwright
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - run:
+          name: Install Playwright
+          command: npx playwright install --with-deps
+      - run:
+          name: Install Playwright MCP Server
+          command: npm install @playwright/mcp@latest
+
+  run-tests-and-upload:
+    executor: playwright
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm ci
+      - run:
+          name: Install Playwright
+          command: npx playwright install --with-deps
+      - run:
+          name: Install Playwright MCP Server
+          command: npm install @playwright/mcp@latest
+      - run:
+          name: Run Playwright MCP Tests
+          command: npm run mcp:headless
+      - store_artifacts:
+          path: cucumber-report.html
+          destination: playwright-test-artifacts
+
+workflows:
+  version: 2
+  playwright-mcp-tests:
+    jobs:
+      - checkout-and-setup
+      - install-dependencies:
+          requires:
+            - checkout-and-setup
+      - install-playwright:
+          requires:
+            - install-dependencies
+      - install-mcp-server:
+          requires:
+            - install-playwright
+      - run-tests-and-upload:
+          requires:
+            - install-mcp-server
