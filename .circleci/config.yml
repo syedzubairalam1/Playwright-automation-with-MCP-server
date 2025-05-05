@@ -11,58 +11,63 @@ jobs:
     executor: playwright
     steps:
       - checkout
-      - run:
-          name: Verify Node.js Setup
-          command: |
-            node --version
-            npm --version
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   install-dependencies:
     executor: playwright
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
       - run:
           name: Install Dependencies
           command: npm ci
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   install-playwright:
     executor: playwright
     steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm ci
+      - attach_workspace:
+          at: .
       - run:
           name: Install Playwright
           command: npx playwright install --with-deps
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   install-mcp-server:
     executor: playwright
     steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm ci
-      - run:
-          name: Install Playwright
-          command: npx playwright install --with-deps
+      - attach_workspace:
+          at: .
       - run:
           name: Install Playwright MCP Server
           command: npm install @playwright/mcp@latest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   run-tests-and-upload:
     executor: playwright
     steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm ci
-      - run:
-          name: Install Playwright
-          command: npx playwright install --with-deps
-      - run:
-          name: Install Playwright MCP Server
-          command: npm install @playwright/mcp@latest
+      - attach_workspace:
+          at: .
       - run:
           name: Run Playwright MCP Tests
           command: npm run mcp:headless
