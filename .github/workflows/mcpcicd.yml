@@ -49,6 +49,13 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright
         run: npx playwright install --with-deps
 
@@ -68,6 +75,13 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+      - name: Restore cached Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright MCP Server
         run: npm install @playwright/mcp@latest
 
@@ -87,8 +101,17 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+      - name: Restore cached Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Run Playwright MCP Tests
         run: npm run mcp:headless
+        env:
+          HEADLESS: true
       - name: Upload Test Artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
