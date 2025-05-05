@@ -9,9 +9,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository code
       - uses: actions/checkout@v4
-      # Set up Node.js environment
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
@@ -21,13 +19,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: CheckoutAndSetup
     steps:
-      # Checkout the repository code
       - uses: actions/checkout@v4
-      # Set up Node.js environment
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      # Install dependencies
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install Dependencies
         run: npm ci
 
@@ -36,16 +38,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: InstallDependencies
     steps:
-      # Checkout the repository code
       - uses: actions/checkout@v4
-      # Set up Node.js environment
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      # Install dependencies
-      - name: Install Dependencies
-        run: npm ci
-      # Install Playwright browsers and dependencies
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install Playwright
         run: npx playwright install --with-deps
 
@@ -54,19 +57,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: InstallPlaywright
     steps:
-      # Checkout the repository code
       - uses: actions/checkout@v4
-      # Set up Node.js environment
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      # Install dependencies
-      - name: Install Dependencies
-        run: npm ci
-      # Install Playwright browsers and dependencies
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-      # Install Playwright MCP server
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Install Playwright MCP Server
         run: npm install @playwright/mcp@latest
 
@@ -75,25 +76,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: InstallMCPServer
     steps:
-      # Checkout the repository code
       - uses: actions/checkout@v4
-      # Set up Node.js environment
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      # Install dependencies
-      - name: Install Dependencies
-        run: npm ci
-      # Install Playwright browsers and dependencies
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-      # Install Playwright MCP server
-      - name: Install Playwright MCP Server
-        run: npm install @playwright/mcp@latest
-      # Start and Run Playwright MCP server in the background
-      - name: Start Playwright MCP Server
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Run Playwright MCP Tests
         run: npm run mcp:headless
-      # Upload test artifacts (e.g., screenshots, logs) if tests fail
       - name: Upload Test Artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
