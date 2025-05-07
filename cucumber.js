@@ -1,9 +1,11 @@
 module.exports = {
   default: {
-    paths: ['Login.feature'],
-    require: ['steps/*.js'],
-    format: ['html:cucumber-report.html', 'summary'],
-    publishQuiet: true,
-    timeout: 60000
+    paths: ['features/*.feature'],
+    require: ['steps/*.js', 'features/support/*.js'],
+    format: [
+      'progress-bar',
+      'html:cucumber-report.html'
+    ],
+    publishQuiet: true
   }
 }; 

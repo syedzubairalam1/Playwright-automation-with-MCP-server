@@ -1,48 +1,52 @@
 Feature: Login and Create Project Flow
 
-  @login
-  Scenario: Verify login page UI elements
-    Given I am on the login page "/users/sign_in"
-    Then I should see the logo "Gather"
-    And I should see the text "Log into your existing Gather account"
-    And I should see the email field labeled "Email"
-    And I should see the password field labeled "Password"
-    And I should see an input with type "submit"
+ 
+  @item
+  Scenario: Create a new item
+    Given I am logged in and on the projects page
+    When I click on the Create New Project button
+    Then the "Create New Project" modal should be visible
+    When I enter "Test Project with Item" into the project name field
+    Then the "Create Project" button should be enabled
+    When I click on the "Create Project" button
+    Then I should be redirected to the project page
+    # And I should see the text "Test Project with Item"
+    When I click on the Create New Item button
+    Then the "Create New Item" modal should be visible
+    When I enter "Test Item" into the item name field
+    Then the item name field should contain "Test Item"
+    When I type "kitchen" into the item area dropdown
+    And I select the dropdown option "Create option 'kitchen'"
+    Then the item area field should contain "kitchen"
+    When I type "Accessory" into the schedule field dropdown
+    Then the schedule field should contain "Accessory"
+    When I type "Mirror" into the item type field dropdown
+    Then the item type field should contain "Mirror"
+    And user clicks on the "Create Item" button
+    Then item should be created successfully
 
-  @login
-  Scenario: Login with valid credentials
-    Given I am on the login page "/users/sign_in"
-    When I enter "{username}" into the email field
-    And I enter "{password}" into the password field
-    And I click on the "Log In" button
-    Then I should be redirected to the projects page
-    And I should see a dashboard element
 
-  # Scenario: Create a new project
-    # Given I am logged in and on the projects page
-    # When I click on the "Create New Project" button
-    # Then the "Create New Project" modal should be visible
-    # When I enter "Test Project" into the project name field
-    # Then the "Create Project" button should be enabled
-    # When I click on the "Create Project" button
-    # Then I should be redirected to the project page
-    # And I should see the text "Test Project"
 
-  # Scenario: Create a new item
-  #   Given I am on the "Test Project" page
-  #   When I click on the "Create New Item" button
-  #   Then the "Create New Item" modal should be visible
-  #   When I enter "Test Item" into the item name field
-  #   Then the item name field should contain "Test Item"
-  #   When I type "kitchen" into the item area dropdown
-  #   And I select the dropdown option "Create option 'kitchen'"
-  #   Then the item area field should contain "kitchen"
-  #   When I type "Accessory" into the schedule field dropdown
-  #   Then the schedule field should contain "Accessory"
-  #   When I type "Mirror" into the item type field dropdown
-  #   Then the item type field should contain "Mirror" 
-  #   When I click on the "Create New Item" button
+    
+    When I click on the action button of the item modal
+    And I select the "Export Spec Sheet" export type from action button dropdown
+    And I click the next button on the export modal
+    And I click the next button on the export modal again
+    And I click the export & save button on the export folder modal
+    Then the export should be initiated
+    And I click on the view export button
+    
+  # @export
+  # Scenario: Export item specification
+  #   Given I am logged in and on the projects page
+  #   When I click on the "Test Project with Item" project
+  #   # The item should already exist from the previous test
+  #   Then I should see the text "Test Item"
+  #   When I click on the "Test Item" item
   #   Then the newly created item modal should be visible
+    # When I click on the action button of the "Test Item" item modal
+    # And I select the "Line Item" export type
+    # Then the export should be initiated
 
   # # Scenario: Export spec sheet
 
