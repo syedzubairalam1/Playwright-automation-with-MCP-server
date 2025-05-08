@@ -8,9 +8,9 @@ Feature: Login and Create Project Flow
     Then the "Create New Project" modal should be visible
     When I enter "Test Project with Item" into the project name field
     Then the "Create Project" button should be enabled
-    When I click on the "Create Project" button
+    When I click on the login "Create Project" button
     Then I should be redirected to the project page
-    # And I should see the text "Test Project with Item"
+    # And I should see the login text "Test Project with Item"
     When I click on the Create New Item button
     Then the "Create New Item" modal should be visible
     When I enter "Test Item" into the item name field
@@ -24,10 +24,6 @@ Feature: Login and Create Project Flow
     Then the item type field should contain "Mirror"
     And user clicks on the "Create Item" button
     Then item should be created successfully
-
-
-
-    
     When I click on the action button of the item modal
     And I select the "Export Spec Sheet" export type from action button dropdown
     And I click the next button on the export modal

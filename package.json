@@ -8,6 +8,7 @@
     "mcp": "npx cucumber-js",
     "mcp:headless": "set HEADLESS=true&& npx cucumber-js",
     "mcp:headed": "set HEADLESS=false&& npx cucumber-js",
+    "mcp:headed:run": "set HEADLESS=false&& npx cucumber-js --profile run",
     "mcp:firefox": "set BROWSER=firefox&& npx cucumber-js",
     "mcp:webkit": "set BROWSER=webkit&& npx cucumber-js",
     "mcp:chrome": "set BROWSER=chromium&& npx cucumber-js",
