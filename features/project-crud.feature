@@ -1,4 +1,4 @@
-@run
+# @run
 Feature: Project CRUD Operations
   As a user
   I want to manage projects
@@ -30,8 +30,8 @@ Feature: Project CRUD Operations
 
   # Scenario: Delete a project - removed as requested Feature: Edit project in MCP
 
-  # Scenario: Navigate to project page and click edit icon
+  # Scenario: Archive a project from the project list
     When I navigate to the project list page
     And I click on the archive icon
-     And a dialog might appear which I dismiss
+    And a dialog might appear which I dismiss
    

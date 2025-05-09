@@ -1893,7 +1893,7 @@ Then('I should not see the text {string}', async function (text) {
 
 When('I navigate to the project list page', async function () {
   const page = await this.getPage();
-  await page.goto('https://stage.gatherit.co/companies/3/projects');
+  await page.goto('https://stage.gatherit.co/companies/732/projects');
 });
 
 When('I click on the archive icon', async function () {
