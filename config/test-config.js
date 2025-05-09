@@ -45,7 +45,7 @@ module.exports = {
   // Test data
   testData: {
     // Login credentials
-    username: process.env.TEST_USERNAME || 'syed@gatherit.co',
+    username: process.env.TEST_USERNAME || 'syed+483102@gatherit.co',
     password: process.env.TEST_PASSWORD || 'Vista123'
   }
 }; 
