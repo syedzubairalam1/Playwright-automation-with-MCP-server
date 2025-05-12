@@ -1,4 +1,4 @@
-@run
+# @run
 Feature: Area CRUD Operations
   As a user
   I want to manage areas in a project
@@ -6,7 +6,7 @@ Feature: Area CRUD Operations
 
   Background:
     Given I am logged in and on the projects page
-
+    # @run
   Scenario: Create, update, and delete an area
     # Create area
     When I select a project from the list

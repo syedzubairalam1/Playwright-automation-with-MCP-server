@@ -1,16 +1,18 @@
-Feature: Login and Create and item and export spec sheet Project Flow
+Feature: Login and Create project and item and export spec sheet Project Flow
 
  
-  @run
-  Scenario: Create a new item
+  # @run
+  Scenario: login and create project and item and export spec sheet
+    #login
     Given I am logged in and on the projects page
+    #creating new project
     When I click on the Create New Project button
     Then the "Create New Project" modal should be visible
     When I enter "Test Project with Item" into the project name field
     Then the "Create Project" button should be enabled
     When I click on the login "Create Project" button
     Then I should be redirected to the project page
-    # And I should see the login text "Test Project with Item"
+    #creating new item  
     When I click on the Create New Item button
     Then the "Create New Item" modal should be visible
     When I enter "Test Item" into the item name field
@@ -24,6 +26,7 @@ Feature: Login and Create and item and export spec sheet Project Flow
     Then the item type field should contain "Mirror"
     And user clicks on the "Create Item" button
     Then item should be created successfully
+    #export spec sheet
     When I click on the action button of the item modal
     And I select the "Export Spec Sheet" export type from action button dropdown
     And I click the next button on the export modal

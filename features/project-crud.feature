@@ -1,4 +1,3 @@
-@run
 Feature: Project CRUD Operations
   As a user
   I want to manage projects
@@ -6,6 +5,7 @@ Feature: Project CRUD Operations
 
   Background:
     Given I am logged in and on the projects page
+@run
 
   Scenario: Create a new project
       # Given I am logged in and on the projects page

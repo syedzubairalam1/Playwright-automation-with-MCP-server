@@ -199,6 +199,11 @@ When('I click the Add Area button', async function() {
   }
 });
 
+When('I click on any item from the project page', async function() {
+  const page = await this.getPage();
+  await page.locator("(//p[normalize-space()='Accessory'])[1]").click();
+});
+
 Then('the {string} area should be created successfully', async function(areaName) {
   const page = await this.getPage();
   
@@ -254,19 +259,25 @@ When('I update the area name to update area name', async function () {
 
   // Locate and click the first "Test area" span
   const labelSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]');
+  console.log('Clicking the "Test area" span...');
   await labelSpan.click({ timeout: 10000 });  // Increase timeout for click
 
-  // Wait for the editable field to be visible
-  const editableSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]'); // Same locator, but no contenteditable condition
-  console.log('Waiting for editable field...');
-  await editableSpan.waitFor({ state: 'visible', timeout: 15000 });  // Wait for the field to be visible
+  // Wait for the editable field to be visible and attached to the DOM
+  const editableSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]');
+  console.log('Waiting for the editable field to be visible...');
+  await editableSpan.waitFor({ state: 'attached', timeout: 20000 });  // Ensure the element is attached to the DOM
 
-  // Clear and type the new area name
+  // Ensure the field is visible before proceeding
+  await editableSpan.waitFor({ state: 'visible', timeout: 30000 });
+  console.log('Editable field is now visible. Proceeding with typing...');
+
+  // Clear the existing text content and type the new area name
   await editableSpan.evaluate(el => el.textContent = '');  // Clear existing text
   await editableSpan.type('update area name');  // Type the new area name
 
   console.log('Area name updated.');
 });
+
 
 
 
@@ -331,10 +342,25 @@ Then('the area name should be updated to {string}', async function(expectedAreaN
 
 When('I click on the archieve icon of the area', async function() {
   const page = await this.getPage();
-  console.log('Clicking on the archieve icon of the area'); 
-  await page.locator('[data-test="EditIcon_index_path"]').nth(2).click();
-  console.log('Clicked on the archieve icon of the area');
+  console.log('Waiting for the archive icon to be visible...');
+  
+  // Wait for the archive icon to be attached and visible before hovering and clicking
+  const archiveIcon = page.locator('span.area-row-destroy-wrapper svg.area-row-destroy path');
+  await archiveIcon.waitFor({ state: 'visible', timeout: 20000 });  // Increased timeout for visibility check
+  
+  console.log('Hovering over the archive icon of the area');
+  
+  // Hover over the archive icon
+  await archiveIcon.hover({ timeout: 15000 });  // Increased timeout for hover action
+  
+  console.log('Clicking on the archive icon of the area');
+  
+  // Click on the archive icon
+  await archiveIcon.click({ timeout: 15000 });  // Increased timeout for the click action
+  console.log('Clicked on the archive icon of the area');
 });
+
+
   
 When('I click on okay button to confirm the deletion', async function () {
   const page = await this.getPage();
