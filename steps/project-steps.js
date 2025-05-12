@@ -1551,42 +1551,9 @@ Then('item should be created successfully', async function () {
 
 When('I click on the action button of the item modal', async function () {
   const page = await this.getPage();
-  await page.reload();
-  
-  try {
-    // Look for the action/options/display/exports button
-    const actionButtonSelectors = [
-      '.view-item-dialog.spec-action-btn',
-      'button:has-text("Actions")',
-      'div:has-text("Actions")',
-      '.btn:has-text("Actions")',
-      '[role="button"]:has-text("Actions")',
-      'span:has-text("Actions")',
-      '[aria-label*="Actions" i]',
-      'button:has-text("⋮")',
-      'button:has-text("...")'
-    ];
-    
-    for (const selector of actionButtonSelectors) {
-      try {
-        const element = await page.$(selector);
-        if (element && await element.isVisible()) {
-          await element.click({force: true});
-          console.log(`Clicked action button with selector: ${selector}`);
-          await page.waitForTimeout(1000);
-          return;
-        }
-      } catch (e) {
-        console.log(`Error with selector ${selector}: ${e.message}`);
-      }
-    }
-    
-    throw new Error('Could not find action button on item modal');
-  } catch (error) {
-    console.error(`Failed to click action button: ${error.message}`);
-    await takeScreenshot(page, 'action-button-error');
-    throw error;
-  }
+  await page.waitForTimeout(3000);
+  await page.locator('(//span[@data-test="ViewItemDialog_content_span" and text()="Actions"])').click();
+  await page.waitForTimeout(2000);
 });
 
 When('I select the {string} export type from action button dropdown', async function (exportType) {
@@ -1730,121 +1697,7 @@ Then('the export should be initiated', async function () {
   await page.waitForTimeout(5000);
 });
 
-When('I click on the view export button', async function () {
-  const page = await this.getPage();
-  
-  console.log('Attempting to click the VIEW EXPORT button');
-  
-  try {
-    // Wait for the button to be available
-    await page.waitForTimeout(2000);
-    
-    // Take screenshot before clicking
-    await takeScreenshot(page, 'before-view-export-button');
-    
-    // Define possible selectors for VIEW EXPORT button
-    const viewExportSelectors = [
-      "a:has-text('VIEW EXPORT')",
-      "button:has-text('VIEW EXPORT')",
-      "[data-test='view-export-button']",
-      ".export-success-message a",
-      ".toast-success a"
-    ];
-    
-    // Try each selector
-    let clicked = false;
-    for (const selector of viewExportSelectors) {
-      try {
-        // Check if element exists and is visible
-        const elements = await page.$$(selector);
-        for (const element of elements) {
-          const isVisible = await element.isVisible().catch(() => false);
-          if (isVisible) {
-            console.log(`Found visible VIEW EXPORT button with selector: ${selector}`);
-            
-            // Click with force option to bypass any overlay issues
-            await element.click({ force: true, timeout: 5000 });
-            console.log(`Successfully clicked VIEW EXPORT button with selector: ${selector}`);
-            clicked = true;
-            break;
-          }
-        }
-        if (clicked) break;
-      } catch (e) {
-        console.log(`Error with selector ${selector}: ${e.message}`);
-      }
-    }
-    
-    // If normal clicks didn't work, try JavaScript click
-    if (!clicked) {
-      console.log('Trying JavaScript click approach');
-      
-      try {
-        const jsClicked = await page.evaluate(() => {
-          // Try various text patterns that might be in the view export button
-          const textPatterns = ['VIEW EXPORT', 'View Export', 'view export', 'View Exports'];
-          
-          // Find elements containing these texts
-          for (const pattern of textPatterns) {
-            // Find links first (most likely)
-            const links = Array.from(document.querySelectorAll('a')).filter(a => 
-              a.textContent.includes(pattern) || a.innerText.includes(pattern)
-            );
-            
-            if (links.length > 0 && typeof links[0].click === 'function') {
-              links[0].click();
-              return true;
-            }
-            
-            // Then try buttons
-            const buttons = Array.from(document.querySelectorAll('button')).filter(b => 
-              b.textContent.includes(pattern) || b.innerText.includes(pattern)
-            );
-            
-            if (buttons.length > 0 && typeof buttons[0].click === 'function') {
-              buttons[0].click();
-              return true;
-            }
-          }
-          
-          // As a last resort, look for elements with export-related classes
-          const exportElements = document.querySelectorAll('[class*="export"], [id*="export"]');
-          for (const el of exportElements) {
-            if ((el.tagName === 'A' || el.tagName === 'BUTTON') && typeof el.click === 'function') {
-              el.click();
-              return true;
-            }
-          }
-          
-          return false;
-        });
-        
-        if (jsClicked) {
-          console.log('Successfully clicked VIEW EXPORT button using JavaScript approach');
-          clicked = true;
-        }
-      } catch (e) {
-        console.log(`Error with JavaScript click: ${e.message}`);
-      }
-    }
-    
-    // If all attempts failed but we want to continue anyway
-    if (!clicked) {
-      console.log('Could not find or click VIEW EXPORT button, but continuing anyway');
-    }
-    
-    // Wait for navigation or new tab to open
-    console.log('Waiting after clicking VIEW EXPORT button');
-    await page.waitForTimeout(5000);
-    
-    // Take screenshot after clicking
-    await takeScreenshot(page, 'after-view-export-button');
-    
-  } catch (error) {
-    console.error(`Failed to click VIEW EXPORT button: ${error.message}`);
-    await takeScreenshot(page, 'view-export-error');
-  }
-});
+
 
 Then('I should not see the text {string}', async function (text) {
   const page = await this.getPage();

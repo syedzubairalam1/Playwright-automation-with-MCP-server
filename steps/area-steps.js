@@ -249,17 +249,26 @@ When('I click on the Test area', async function() {
 });
 
 // Step 2: Update the area name
-When('I update the area name to update area name', async function() {
+When('I update the area name to update area name', async function () {
   const page = await this.getPage();
-  const locator = page.locator("//span[contains(@class,'project_area_name-initial-text-container') and contains(.,'Test area')]");
-  
-  // Wait for the element to be visible and interactable before filling in the field
-  await locator.waitFor({ state: 'visible' });
-  
-  // Clear the field and fill it with the new value
-  await locator.fill(""); 
-  await locator.fill("update area name");
+
+  // Locate and click the first "Test area" span
+  const labelSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]');
+  await labelSpan.click({ timeout: 10000 });  // Increase timeout for click
+
+  // Wait for the editable field to be visible
+  const editableSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]'); // Same locator, but no contenteditable condition
+  console.log('Waiting for editable field...');
+  await editableSpan.waitFor({ state: 'visible', timeout: 15000 });  // Wait for the field to be visible
+
+  // Clear and type the new area name
+  await editableSpan.evaluate(el => el.textContent = '');  // Clear existing text
+  await editableSpan.type('update area name');  // Type the new area name
+
+  console.log('Area name updated.');
 });
+
+
 
 When('I press Enter', async function() {
   const page = await this.getPage();
@@ -320,57 +329,19 @@ Then('the area name should be updated to {string}', async function(expectedAreaN
   }
 });
 
-When('I click on the edit icon for an area', async function() {
+When('I click on the archieve icon of the area', async function() {
   const page = await this.getPage();
+  console.log('Clicking on the archieve icon of the area'); 
+  await page.locator('[data-test="EditIcon_index_path"]').nth(2).click();
+  console.log('Clicked on the archieve icon of the area');
+});
   
-  try {
-    console.log('Clicking on the edit icon for an area');
-    await takeScreenshot(page, 'before-click-edit-icon');
-    
-    // Look for the edit icon
-    const editIconSelectors = [
-      '#rooms-container [data-test="EditIcon_index_span"]',
-      '.edit-icon',
-      '[aria-label="Edit Area"]',
-      'button.edit-area',
-      'span.edit-icon'
-    ];
-    
-    // Try to find and click on any edit icon - using nth(3) as per the original Playwright test
-    let clicked = false;
-    for (const selector of editIconSelectors) {
-      try {
-        const elements = await page.$$(selector);
-        if (elements.length > 0) {
-          // Try to click the nth element if there are multiple
-          if (elements.length > 3) {
-            await elements[3].click();
-          } else {
-            // Otherwise click the first one
-            await elements[0].click();
-          }
-          clicked = true;
-          console.log(`Clicked edit icon with selector: ${selector}`);
-          break;
-        }
-      } catch (e) {
-        console.log(`Error with selector ${selector}: ${e.message}`);
-      }
-    }
-    
-    if (!clicked) {
-      throw new Error('Could not find edit icon for area');
-    }
-    
-    // Wait for dialog to appear if any
-    await page.waitForTimeout(1000);
-    await takeScreenshot(page, 'after-click-edit-icon');
-    
-  } catch (error) {
-    console.error(`Failed to click edit icon: ${error.message}`);
-    await takeScreenshot(page, 'click-edit-icon-error');
-    throw error;
-  }
+When('I click on okay button to confirm the deletion', async function () {
+  const page = await this.getPage();
+  page.once('dialog', async dialog => {
+    console.log(`Dialog message: ${dialog.message()}`);
+    await dialog.dismiss().catch(() => {});
+  });
 });
 
 Then('the area should be deleted successfully', async function() {

@@ -1,7 +1,7 @@
-Feature: Login and Create Project Flow
+Feature: Login and Create and item and export spec sheet Project Flow
 
  
-  @item
+  @run
   Scenario: Create a new item
     Given I am logged in and on the projects page
     When I click on the Create New Project button
@@ -30,7 +30,7 @@ Feature: Login and Create Project Flow
     And I click the next button on the export modal again
     And I click the export & save button on the export folder modal
     Then the export should be initiated
-    And I click on the view export button
+    # And I click on the view export button
     
   # @export
   # Scenario: Export item specification

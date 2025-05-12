@@ -16,12 +16,12 @@ Feature: Area CRUD Operations
     Then the "Test area" area should be created successfully
     
     # Update area
-    When I click on the Test area 
+    # When I click on the Test area 
     And I update the area name to update area name
     And I press Enter
     Then the area name should be updated to "update area name"
     
     # Delete area
-    When I click on the edit icon for an area
-    And a dialog might appear which I dismiss
+    When I click on the archieve icon of the area
+    And I click on okay button to confirm the deletion
     Then the area should be deleted successfully 

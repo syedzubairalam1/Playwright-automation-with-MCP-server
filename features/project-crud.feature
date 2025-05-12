@@ -1,4 +1,4 @@
-# @run
+@run
 Feature: Project CRUD Operations
   As a user
   I want to manage projects
