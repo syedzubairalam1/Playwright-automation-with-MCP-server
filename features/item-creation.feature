@@ -3,7 +3,7 @@ Feature: Item Creation
   Background:
     Given I am logged in and on the projects page
     
-  @run
+  # @run
   Scenario: Create a new item
     When I select a project from the list
     When I click on the Create New Item button

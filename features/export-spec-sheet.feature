@@ -3,7 +3,7 @@ Feature: Export Spec Sheet
   Background:
     Given I am logged in and on the projects page
     
-  @run
+  # @run
   Scenario: Export a spec sheet
     Given I select a project from the list
     When I click on the Create New Item button

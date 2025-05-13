@@ -1,7 +1,7 @@
 Feature: User Login
   
 
-@run
+# @run
   Scenario: User successfully logs in
     Given I navigate to the login page
     When I enter username

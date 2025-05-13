@@ -1428,62 +1428,6 @@ When('user clicks on the {string} button', async function (buttonText) {
   await clickButtonWithText(page, buttonText);
 });
 
-// Add the same implementation for "I click on..." format
-When('I click on the {string} button', async function (buttonText) {
-  const page = await this.getPage();
-  console.log(`Trying to click button with text: ${buttonText}`);
-  
-  // Special handling for Create Item button same as in the user clicks version
-  if (buttonText.includes("Create Item")) {
-    // Take screenshot before clicking
-    await takeScreenshot(page, `before-create-item-button-special`);
-    
-    // Try to find and click the Create Item button
-    const createItemSelectors = [
-      'button[type="submit"]',
-      'button:has-text("Create")',
-      'button:has-text("CREATE")',
-      'button:has-text("Create Item")',
-      '.modal button:last-child', // Often the last button in a modal is the submit button
-      'form button:last-child'     // Same for forms
-    ];
-    
-    for (const selector of createItemSelectors) {
-      try {
-        const buttons = await page.$$(selector);
-        for (const button of buttons) {
-          if (await button.isVisible()) {
-            // Try JavaScript click first
-            try {
-              await page.evaluate(el => el.click(), button);
-              console.log(`Clicked Create Item button using JavaScript`);
-              await page.waitForTimeout(2000);
-              return;
-            } catch (jsErr) {
-              // Try force click
-              await button.click({force: true});
-              console.log(`Clicked Create Item button using force click`);
-              await page.waitForTimeout(2000);
-              return;
-            }
-          }
-        }
-      } catch (e) {
-        console.log(`Error with selector ${selector}: ${e.message}`);
-      }
-    }
-    
-    // If button click failed, try pressing Enter
-    console.log("Pressing Enter key to submit...");
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(2000);
-    return;
-  }
-  
-  // For other buttons, use the clickButtonWithText helper
-  await clickButtonWithText(page, buttonText);
-});
-
 Then('item should be created successfully', async function () {
   const page = await this.getPage();
   console.log('Verifying item was created successfully');
@@ -1681,8 +1625,6 @@ Then('the export should be initiated', async function () {
   await page.waitForTimeout(5000);
 });
 
-
-
 Then('I should not see the text {string}', async function (text) {
   const page = await this.getPage();
   
@@ -1727,7 +1669,6 @@ Then('I should not see the text {string}', async function (text) {
   }
 }); 
 
-
 When('I navigate to the project list page', async function () {
   const page = await this.getPage();
   await page.goto('https://stage.gatherit.co/companies/732/projects');
@@ -1735,7 +1676,30 @@ When('I navigate to the project list page', async function () {
 
 When('I click on the archive icon', async function () {
   const page = await this.getPage();
-  await page.locator('.buttons-col-style').first().click();
+  try {
+    console.log('Attempting to click on the archive icon');
+    
+    // Take a screenshot before attempting to click
+    await takeScreenshot(page, 'before-archive-icon-click');
+    
+    // First check if the element exists and is visible
+    const archiveIcon = page.locator('.buttons-col-style').first();
+    
+    // Wait for the element to be visible with a reasonable timeout
+    await archiveIcon.waitFor({ state: 'visible', timeout: 10000 });
+    
+    // Click with a force option in case there are overlays or other issues
+    await archiveIcon.click({ force: true });
+    
+    console.log('Successfully clicked the archive icon');
+    
+    // Wait a moment for any action triggered by the click
+    await page.waitForTimeout(1000);
+  } catch (error) {
+    console.error(`Failed to click on archive icon: ${error.message}`);
+    await takeScreenshot(page, 'archive-icon-click-error');
+    throw error;
+  }
 });
 
 When('a dialog might appear which I dismiss', async function () {
@@ -1755,5 +1719,4 @@ Then('the edit project form should be displayed', async function () {
   const page = await this.getPage();
   // Adjust this locator to match a known part of the edit form, such as a field or title
   await expect(page.locator('form')).toBeVisible();
-
 });

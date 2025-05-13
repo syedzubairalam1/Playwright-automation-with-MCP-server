@@ -14,6 +14,6 @@ Feature: Area CRUD Operations
   When I update the area name
   And I press Enter
   Then the area name should be updated to "update area name"
-  When I click on the archive icon of the area
+  When I click on the archives icon of the areas
   And I click on okay button to confirm the deletion
   Then the area should be deleted successfully

@@ -269,7 +269,7 @@ Then('the area name should be updated to {string}', async function(expectedAreaN
   }
 });
 
-When('I click on the archieve icon of the area', async function() {
+When('I click on the archives icon of the areas', async function() {
   const page = await this.getPage();
   console.log('Waiting for the archive icon to be visible...');
   

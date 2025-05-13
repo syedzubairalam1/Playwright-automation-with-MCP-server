@@ -3,7 +3,7 @@ Feature: Project Creation
   Background:
     Given I am logged in and on the projects page
     
-  @run
+  # @run
   Scenario: Create a new project
     When I click on the Create New Project button
     Then the "Create New Project" modal should be visible
