@@ -1,10 +1,11 @@
 Feature: Item Creation
   
-@run
   Background:
     Given I am logged in and on the projects page
+    
+  @run
   Scenario: Create a new item
-     When I select a project from the list
+    When I select a project from the list
     When I click on the Create New Item button
     Then the "Create New Item" modal should be visible
     When I enter "Test Item" into the item name field

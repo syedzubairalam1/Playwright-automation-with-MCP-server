@@ -1,9 +1,9 @@
 Feature: Project CRUD Operations
  
-@run
   Background:
     Given I am logged in and on the projects page
 
+  @run
   Scenario: Create a new project
     When I click on the Create New Project button
     Then the "Create Project" modal should be visible
