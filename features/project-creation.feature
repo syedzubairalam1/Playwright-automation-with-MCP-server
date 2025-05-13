@@ -1,9 +1,7 @@
 Feature: Project Creation
-  As a user
-  I want to create a new project
-  So that I can organize my items
+ 
 
-# @run
+@run
   Background:
     Given I am logged in and on the projects page
     

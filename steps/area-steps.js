@@ -23,7 +23,7 @@ async function takeScreenshot(page, scenarioName) {
 }
 
 // Step definitions for Area CRUD operations
-When('I select a project from the list', async function() {
+Given('I select a project from the list', async function() {
   const page = await this.getPage();
   await page.locator("(//div[@class='project-item'])[1]").waitFor({ state: 'visible' });
   await page.locator("(//div[@class='project-item'])[1]").click();
@@ -178,7 +178,7 @@ When('I click on the Test area', async function() {
 });
 
 // Step 2: Update the area name
-When('I update the area name to update area name', async function () {
+When('I update the area name', async function () {
   const page = await this.getPage();
 
   try {

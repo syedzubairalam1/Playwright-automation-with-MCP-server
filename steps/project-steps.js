@@ -723,127 +723,55 @@ When('I click on the {string} button', async function (buttonText) {
   const page = await this.getPage();
   console.log(`Trying to click button with text: ${buttonText}`);
   
-  // Take screenshot before clicking
-  try {
-    await takeScreenshot(page, `before-click-${buttonText.replace(/\s+/g, '-').toLowerCase()}`);
-  } catch (e) {
-    console.log(`Screenshot error: ${e.message}`);
-  }
-  
-  // Try multiple selector strategies
-  const possibleSelectors = [
-    `button:has-text("${buttonText}")`,
-    `input[type="submit"][value="${buttonText}"]`,
-    `a:has-text("${buttonText}")`,
-    `button:has-text("${buttonText.toLowerCase()}")`,
-    `button:has-text("${buttonText.toUpperCase()}")`,
-    `.btn:has-text("${buttonText}")`,
-    `[type="submit"]`,
-    `form button`, 
-    `form [type="submit"]`,
-    `form input[type="submit"]`,
-    // Additional selectors for more flexibility
-    `button:visible`,
-    `.btn-primary`,
-    `.submit-btn`,
-    `[role="button"]:has-text("${buttonText}")`,
-    `button[type="submit"]:visible`
-  ];
-  
-  // Try each selector
-  let clicked = false;
-  for (const selector of possibleSelectors) {
-    try {
-      console.log(`Trying selector: ${selector}`);
-      const elements = await page.$$(selector);
-      if (elements.length > 0) {
-        console.log(`Found ${elements.length} elements with selector: ${selector}`);
-        // Check if visible before clicking
-        for (const element of elements) {
-          if (await element.isVisible()) {
-            // Try to get text to log what we're clicking
+  // Special handling for Create Item button same as in the user clicks version
+  if (buttonText.includes("Create Item")) {
+    // Take screenshot before clicking
+    await takeScreenshot(page, `before-create-item-button-special`);
+    
+    // Try to find and click the Create Item button
+    const createItemSelectors = [
+      'button[type="submit"]',
+      'button:has-text("Create")',
+      'button:has-text("CREATE")',
+      'button:has-text("Create Item")',
+      '.modal button:last-child', // Often the last button in a modal is the submit button
+      'form button:last-child'     // Same for forms
+    ];
+    
+    for (const selector of createItemSelectors) {
+      try {
+        const buttons = await page.$$(selector);
+        for (const button of buttons) {
+          if (await button.isVisible()) {
+            // Try JavaScript click first
             try {
-              const text = await element.textContent();
-              console.log(`Element text: "${text}"`);
-            } catch (e) {
-              console.log(`Could not get text content: ${e.message}`);
+              await page.evaluate(el => el.click(), button);
+              console.log(`Clicked Create Item button using JavaScript`);
+              await page.waitForTimeout(2000);
+              return;
+            } catch (jsErr) {
+              // Try force click
+              await button.click({force: true});
+              console.log(`Clicked Create Item button using force click`);
+              await page.waitForTimeout(2000);
+              return;
             }
-            
-            // Add a small delay before clicking
-            await page.waitForTimeout(500);
-            
-            // For buttons that might cause navigation, use JS click
-            if (buttonText.includes("Create") || buttonText.includes("Submit") || 
-                buttonText.includes("Save") || buttonText.includes("Confirm") || 
-                buttonText.includes("Delete")) {
-              try {
-                console.log('Using JavaScript click for potentially navigating button');
-                await page.evaluate(el => el.click(), element);
-                clicked = true;
-              } catch (jsErr) {
-                console.log(`JavaScript click failed: ${jsErr.message}, trying regular click`);
-                await element.click({timeout: 5000});
-                clicked = true;
-              }
-            } else {
-              // Try clicking with various force options if regular click fails
-              try {
-                await element.click({timeout: 5000});
-                clicked = true;
-              } catch (e) {
-                console.log(`Regular click failed: ${e.message}, trying with force: true`);
-                await element.click({force: true, timeout: 5000});
-                clicked = true;
-              }
-            }
-            
-            console.log(`Successfully clicked element with selector: ${selector}`);
-            break;
-          } else {
-            console.log(`Element with selector ${selector} found but not visible`);
           }
         }
-        if (clicked) break;
+      } catch (e) {
+        console.log(`Error with selector ${selector}: ${e.message}`);
       }
-    } catch (e) {
-      console.log(`Failed to click with selector: ${selector}`);
     }
+    
+    // If button click failed, try pressing Enter
+    console.log("Pressing Enter key to submit...");
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(2000);
+    return;
   }
   
-  if (!clicked) {
-    console.log('Trying to click by keyboard submit as last resort');
-    try {
-      await page.keyboard.press('Enter');
-      clicked = true;
-    } catch (e) {
-      console.log('Enter key press failed');
-    }
-  }
-  
-  if (!clicked) {
-    throw new Error(`Could not find clickable element with text: ${buttonText}`);
-  }
-  
-  // For non-navigating buttons, take a screenshot after clicking
-  if (!buttonText.includes("Create") && !buttonText.includes("Submit") && 
-      !buttonText.includes("Save") && !buttonText.includes("Confirm") && 
-      !buttonText.includes("Delete")) {
-    try {
-      // Take screenshot after clicking
-      await takeScreenshot(page, `after-click-${buttonText.replace(/\s+/g, '-').toLowerCase()}`);
-    } catch (e) {
-      console.log(`After-click screenshot error: ${e.message}`);
-    }
-  }
-  
-  // Wait for navigation or network to be idle
-  try {
-    console.log('Waiting for page load state after button click...');
-    await page.waitForLoadState('networkidle', { timeout: 20000 });
-    console.log('Page load state complete');
-  } catch (e) {
-    console.log('Navigation or network idle wait timed out, continuing...');
-  }
+  // For other buttons, use the clickButtonWithText helper
+  await clickButtonWithText(page, buttonText);
 });
 
 // Verification steps
@@ -1450,6 +1378,62 @@ When('user clicks on the {string} button', async function (buttonText) {
   console.log(`Trying to click button with text: ${buttonText}`);
   
   // Special handling for Create Item button
+  if (buttonText.includes("Create Item")) {
+    // Take screenshot before clicking
+    await takeScreenshot(page, `before-create-item-button-special`);
+    
+    // Try to find and click the Create Item button
+    const createItemSelectors = [
+      'button[type="submit"]',
+      'button:has-text("Create")',
+      'button:has-text("CREATE")',
+      'button:has-text("Create Item")',
+      '.modal button:last-child', // Often the last button in a modal is the submit button
+      'form button:last-child'     // Same for forms
+    ];
+    
+    for (const selector of createItemSelectors) {
+      try {
+        const buttons = await page.$$(selector);
+        for (const button of buttons) {
+          if (await button.isVisible()) {
+            // Try JavaScript click first
+            try {
+              await page.evaluate(el => el.click(), button);
+              console.log(`Clicked Create Item button using JavaScript`);
+              await page.waitForTimeout(2000);
+              return;
+            } catch (jsErr) {
+              // Try force click
+              await button.click({force: true});
+              console.log(`Clicked Create Item button using force click`);
+              await page.waitForTimeout(2000);
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.log(`Error with selector ${selector}: ${e.message}`);
+      }
+    }
+    
+    // If button click failed, try pressing Enter
+    console.log("Pressing Enter key to submit...");
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(2000);
+    return;
+  }
+  
+  // For other buttons, use the clickButtonWithText helper
+  await clickButtonWithText(page, buttonText);
+});
+
+// Add the same implementation for "I click on..." format
+When('I click on the {string} button', async function (buttonText) {
+  const page = await this.getPage();
+  console.log(`Trying to click button with text: ${buttonText}`);
+  
+  // Special handling for Create Item button same as in the user clicks version
   if (buttonText.includes("Create Item")) {
     // Take screenshot before clicking
     await takeScreenshot(page, `before-create-item-button-special`);

@@ -1,6 +1,4 @@
-// This file contains step definitions for Cucumber features
-// It maps Gherkin steps to JavaScript implementations
-// For proper step navigation, ensure step strings in feature files match exactly with patterns here
+
 const { Given, When, Then, setDefaultTimeout } = require('@cucumber/cucumber');
 const config = require('../config/test-config');
 const fs = require('fs');

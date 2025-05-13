@@ -1,12 +1,8 @@
 Feature: Item Creation
-  As a user
-  I want to create new items in a project
-  So that I can track project components
-
-# @run
+  
+@run
   Background:
     Given I am logged in and on the projects page
-    # Assume we're already in a project
   Scenario: Create a new item
      When I select a project from the list
     When I click on the Create New Item button
