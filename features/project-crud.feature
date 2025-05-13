@@ -3,9 +3,11 @@ Feature: Project CRUD Operations
   I want to manage projects
   So that I can organize my work effectively
 
+
+# @run
   Background:
     Given I am logged in and on the projects page
-@run
+
 
   Scenario: Create a new project
       # Given I am logged in and on the projects page

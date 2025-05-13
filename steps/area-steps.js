@@ -25,90 +25,13 @@ async function takeScreenshot(page, scenarioName) {
 // Step definitions for Area CRUD operations
 When('I select a project from the list', async function() {
   const page = await this.getPage();
-  
-  try {
-    console.log('Attempting to select a project from the list');
-    await takeScreenshot(page, 'before-select-project');
-    
-    // Look for paragraphs containing "last updated" and click the first one
-    const projectSelectors = [
-      'p:has-text("last updated")',
-      '[data-test="ProjectCard_index_div"]',
-      '.project-card',
-      '.project-item'
-    ];
-    
-    let clicked = false;
-    for (const selector of projectSelectors) {
-      try {
-        const elements = await page.$$(selector);
-        if (elements.length > 0) {
-          await elements[0].click();
-          clicked = true;
-          console.log(`Clicked project with selector: ${selector}`);
-          break;
-        }
-      } catch (e) {
-        console.log(`Error with selector ${selector}: ${e.message}`);
-      }
-    }
-    
-    if (!clicked) {
-      throw new Error('Could not find any project to click');
-    }
-    
-    // Wait for project to load
-    await page.waitForTimeout(2000);
-    await takeScreenshot(page, 'after-select-project');
-    
-  } catch (error) {
-    console.error(`Failed to select project: ${error.message}`);
-    await takeScreenshot(page, 'select-project-error');
-    throw error;
-  }
+  await page.locator("(//div[@class='project-item'])[1]").waitFor({ state: 'visible' });
+  await page.locator("(//div[@class='project-item'])[1]").click();
 });
 
 When('I click on the new area input field', async function() {
   const page = await this.getPage();
-  
-  try {
-    console.log('Attempting to click on the new area input field');
-    await takeScreenshot(page, 'before-click-area-input');
-    
-    // Look for the area input field
-    const areaInputSelectors = [
-      '[data-test="NewAreaForm_index_input"]',
-      'input[placeholder*="area" i]',
-      '.area-input',
-      'input[name*="area" i]'
-    ];
-    
-    let clicked = false;
-    for (const selector of areaInputSelectors) {
-      try {
-        const element = await page.$(selector);
-        if (element && await element.isVisible()) {
-          await element.click();
-          clicked = true;
-          console.log(`Clicked area input field with selector: ${selector}`);
-          break;
-        }
-      } catch (e) {
-        console.log(`Error with selector ${selector}: ${e.message}`);
-      }
-    }
-    
-    if (!clicked) {
-      throw new Error('Could not find the area input field');
-    }
-    
-    await page.waitForTimeout(500);
-    
-  } catch (error) {
-    console.error(`Failed to click on area input field: ${error.message}`);
-    await takeScreenshot(page, 'click-area-input-error');
-    throw error;
-  }
+  await page.locator("#area_name").click();
 });
 
 When('I enter {string} into the area name field', async function(areaName) {
@@ -201,7 +124,7 @@ When('I click the Add Area button', async function() {
 
 When('I click on any item from the project page', async function() {
   const page = await this.getPage();
-  await page.locator("(//p[normalize-space()='Accessory'])[1]").click();
+  await page.locator('//p[@data-test="SpecGridItem_content_p" and text()="Item 1"]').click();
 });
 
 Then('the {string} area should be created successfully', async function(areaName) {
@@ -246,6 +169,7 @@ Then('the {string} area should be created successfully', async function(areaName
 
 When('I click on the Test area', async function() {
   const page = await this.getPage();
+  await page.waitForTimeout(10000);
   const locator = page.locator("//span[contains(@class,'project_area_name-initial-text-container') and contains(.,'Test area')]");
   
   // Wait for the element to be visible and interactable before clicking
@@ -257,29 +181,34 @@ When('I click on the Test area', async function() {
 When('I update the area name to update area name', async function () {
   const page = await this.getPage();
 
-  // Locate and click the first "Test area" span
-  const labelSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]');
-  console.log('Clicking the "Test area" span...');
-  await labelSpan.click({ timeout: 10000 });  // Increase timeout for click
-
-  // Wait for the editable field to be visible and attached to the DOM
-  const editableSpan = page.locator('(//span[@data-test="EditableField_index_span"]//span[text()="Test area"])[1]');
-  console.log('Waiting for the editable field to be visible...');
-  await editableSpan.waitFor({ state: 'attached', timeout: 20000 });  // Ensure the element is attached to the DOM
-
-  // Ensure the field is visible before proceeding
-  await editableSpan.waitFor({ state: 'visible', timeout: 30000 });
-  console.log('Editable field is now visible. Proceeding with typing...');
-
-  // Clear the existing text content and type the new area name
-  await editableSpan.evaluate(el => el.textContent = '');  // Clear existing text
-  await editableSpan.type('update area name');  // Type the new area name
-
-  console.log('Area name updated.');
+  try {
+    // First get the locator - use first() to get only the first match
+    const locator = page.locator('//span[contains(@class, "project_area_name-initial-text-container") and text()="Test area"]').first();
+    
+    console.log("Waiting for Test area to be visible");
+    // Wait for it to be visible
+    await locator.waitFor({ state: 'visible', timeout: 5000 });
+    
+    console.log("Clicking on Test area");
+    // Click on it
+    await locator.click();
+    
+    console.log("Waiting for editable field");
+    // Wait a moment for the editable field to appear
+    await page.waitForTimeout(1000);
+    
+    // Use a different locator for the editable field if needed
+    console.log("Filling with new text");
+    // Try with a more specific selector for the editable input
+    await page.fill('input.editable-area-input, [contenteditable="true"], input[type="text"]:focus', 'update area name');
+    
+    console.log("Area name updated");
+  } catch (error) {
+    console.error(`Error updating area name: ${error.message}`);
+    await takeScreenshot(page, 'update-area-error');
+    throw error;
+  }
 });
-
-
-
 
 When('I press Enter', async function() {
   const page = await this.getPage();
@@ -360,8 +289,6 @@ When('I click on the archieve icon of the area', async function() {
   console.log('Clicked on the archive icon of the area');
 });
 
-
-  
 When('I click on okay button to confirm the deletion', async function () {
   const page = await this.getPage();
   page.once('dialog', async dialog => {

@@ -2,11 +2,11 @@ Feature: Export Spec Sheet
   As a user
   I want to export spec sheets for items
   So that I can share item specifications
-@run
+
   
    
     # Assume we're in an item view
-    
+    @run
   Scenario: Export item spec sheet
    Given I am logged in and on the projects page
        When I select a project from the list

@@ -7,6 +7,8 @@
     "cucumber": "cucumber-js",
     "mcp": "npx cucumber-js",
     "mcp:headless": "set HEADLESS=true&& npx cucumber-js",
+    "mcp:headless:run": "set HEADLESS=true&& npx cucumber-js --profile run",
+    "mcp:headless:area": "set HEADLESS=true&& npx cucumber-js --name \"Create, update, and delete an area\"",
     "mcp:headed": "set HEADLESS=false&& npx cucumber-js",
     "mcp:headed:run": "set HEADLESS=false&& npx cucumber-js --profile run",
     "mcp:firefox": "set BROWSER=firefox&& npx cucumber-js",

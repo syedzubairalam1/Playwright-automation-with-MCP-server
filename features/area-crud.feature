@@ -1,12 +1,14 @@
-# @run
 Feature: Area CRUD Operations
   As a user
   I want to manage areas in a project
   So that I can organize my project effectively
 
+  
+
   Background:
     Given I am logged in and on the projects page
-    # @run
+    
+  # @run
   Scenario: Create, update, and delete an area
     # Create area
     When I select a project from the list

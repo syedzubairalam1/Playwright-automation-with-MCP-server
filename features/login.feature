@@ -2,7 +2,8 @@ Feature: User Login
   As a user
   I want to log in to the application
   So that I can access my projects
-@run
+
+# @run
   Scenario: User successfully logs in
     Given I navigate to the login page
     When I enter username
