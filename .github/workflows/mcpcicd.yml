@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:  # ✅ Allows manual trigger from GitHub UI
 
 jobs:
   CheckoutAndSetup:
@@ -93,7 +94,7 @@ jobs:
     needs: InstallMCPServer
     strategy:
       matrix:
-        shardIndex: [1, 2]
+        shardIndex: [1, 2]  # Split into 2 parallel jobs
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -127,4 +128,3 @@ jobs:
         with:
           name: playwright-test-artifacts-shard-${{ matrix.shardIndex }}
           path: cucumber-report.html
-          
