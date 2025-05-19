@@ -162,7 +162,10 @@ jobs:
       # :white_check_mark: Step to sanitize the artifact name
       - name: Set Safe Artifact Name
         id: sanitize
-        run: echo "name=artifacts-$(echo '${{ matrix.feature }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+        run: |
+          sanitized_name="artifacts-$(echo '${{ matrix.feature }}' | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]/_/g')"
+          echo "name=$sanitized_name"
+          echo "name=$sanitized_name" >> $GITHUB_OUTPUT
       # :white_check_mark: Use the sanitized name for the artifact
       - name: Upload Artifacts
         if: ${{ always() }}
