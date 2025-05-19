@@ -126,9 +126,16 @@ jobs:
     strategy:
       matrix:
         feature:
-          - tests/features/login.feature
-          - tests/features/signup.feature
-          - tests/features/checkout.feature
+          - features/area-crud.feature
+          - features/export-spec-sheet.feature
+          - features/global-nav.feature
+          - features/item-creation.feature
+          - features/item-crud.feature
+          - features/login.feature
+          - features/project-crud.feature
+          - features/project-settings-access.feature
+          - features/project-settings-content.feature
+          - features/project-settings-update.feature
           # Add more features here
     steps:
       - uses: actions/checkout@v4
