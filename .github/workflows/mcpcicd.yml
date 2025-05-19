@@ -136,7 +136,6 @@ jobs:
           - features/project-settings-access.feature
           - features/project-settings-content.feature
           - features/project-settings-update.feature
-          # Add more features here
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -160,9 +159,14 @@ jobs:
         run: npx cucumber-js ${{ matrix.feature }}
         env:
           HEADLESS: true
-      - name: Upload Artifacts for ${{ matrix.feature }}
+      # :white_check_mark: Step to sanitize the artifact name
+      - name: Set Safe Artifact Name
+        id: sanitize
+        run: echo "name=artifacts-$(echo '${{ matrix.feature }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+      # :white_check_mark: Use the sanitized name for the artifact
+      - name: Upload Artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.feature }}
+          name: ${{ steps.sanitize.outputs.name }}
           path: cucumber-report.html
