@@ -85,57 +85,10 @@ jobs:
       - name: Install Playwright MCP Server
         run: npm install @playwright/mcp@latest
 
-  # RunTestAndUpload:
-  #   timeout-minutes: 60
-  #   runs-on: ubuntu-latest
-  #   needs: InstallMCPServer
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '18'
-  #     - name: Restore cached node_modules
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: node_modules
-  #         key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-node-
-  #     - name: Restore cached Playwright browsers
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ~/.cache/ms-playwright
-  #         key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-playwright-
-  #     - name: Run Playwright MCP Tests
-  #       run: npm run mcp:headless
-  #       env:
-  #         HEADLESS: true
-  #     - name: Upload Test Artifacts
-  #       if: ${{ always() }}
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: playwright-test-artifacts
-  #         path: cucumber-report.html
-
-  RunTestsMatrix:
+  RunTestAndUpload:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     needs: InstallMCPServer
-    strategy:
-      matrix:
-        feature:
-          - features/area-crud.feature
-          - features/export-spec-sheet.feature
-          - features/global-nav.feature
-          - features/item-creation.feature
-          - features/item-crud.feature
-          - features/login.feature
-          - features/project-crud.feature
-          - features/project-settings-access.feature
-          - features/project-settings-content.feature
-          - features/project-settings-update.feature
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -155,21 +108,13 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
-      - name: Run Playwright MCP Test - ${{ matrix.feature }}
-        run: npx cucumber-js ${{ matrix.feature }}
+      - name: Run Playwright MCP Tests
+        run: npm run mcp:headless
         env:
           HEADLESS: true
-      # :white_check_mark: Step to sanitize the artifact name
-      - name: Set Safe Artifact Name
-        id: sanitize
-        run: |
-          sanitized_name="artifacts-$(echo '${{ matrix.feature }}' | sed 's/\//-/g' | sed 's/[^a-zA-Z0-9._-]/_/g')"
-          echo "name=$sanitized_name"
-          echo "name=$sanitized_name" >> $GITHUB_OUTPUT
-      # :white_check_mark: Use the sanitized name for the artifact
-      - name: Upload Artifacts
+      - name: Upload Test Artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.sanitize.outputs.name }}
+          name: playwright-test-artifacts
           path: cucumber-report.html
