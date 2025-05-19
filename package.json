@@ -23,7 +23,9 @@
     "mcp:server:project": "node run-with-mcp-server.js project",
     "mcp:server:login": "node run-with-mcp-server.js login",
     "mcp:server:item": "node run-with-mcp-server.js item",
-    "mcp:project:crud": "npx cucumber-js features/project-crud.feature"
+    "mcp:project:crud": "npx cucumber-js features/project-crud.feature",
+    "mcp:vision": "npx cucumber-js features/Vision-crud.feature",
+    "mcp:item:crud": "npx cucumber-js features/item-crud.feature"
   },
   "keywords": [],
   "author": "",

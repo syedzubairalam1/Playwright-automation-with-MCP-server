@@ -1,7 +1,7 @@
 module.exports = {
   default: {
     paths: ['features/*.feature'],
-    require: ['steps/*.js', 'features/support/*.js'],
+    require: ['steps/**/*.js', 'features/support/*.js'],
     format: [
       'progress-bar',
       'html:cucumber-report.html'
@@ -10,7 +10,7 @@ module.exports = {
   },
   run: {
     paths: ['features/*.feature'],
-    require: ['steps/*.js', 'features/support/*.js'],
+    require: ['steps/**/*.js', 'features/support/*.js'],
     format: [
       'progress-bar',
       'html:cucumber-report.html'

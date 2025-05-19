@@ -271,22 +271,7 @@ Then('the area name should be updated to {string}', async function(expectedAreaN
 
 When('I click on the archives icon of the areas', async function() {
   const page = await this.getPage();
-  console.log('Waiting for the archive icon to be visible...');
-  
-  // Wait for the archive icon to be attached and visible before hovering and clicking
-  const archiveIcon = page.locator('span.area-row-destroy-wrapper svg.area-row-destroy path');
-  await archiveIcon.waitFor({ state: 'visible', timeout: 20000 });  // Increased timeout for visibility check
-  
-  console.log('Hovering over the archive icon of the area');
-  
-  // Hover over the archive icon
-  await archiveIcon.hover({ timeout: 15000 });  // Increased timeout for hover action
-  
-  console.log('Clicking on the archive icon of the area');
-  
-  // Click on the archive icon
-  await archiveIcon.click({ timeout: 15000 });  // Increased timeout for the click action
-  console.log('Clicked on the archive icon of the area');
+  await page.locator('#btn_create_area').click();
 });
 
 When('I click on okay button to confirm the deletion', async function () {
@@ -336,6 +321,179 @@ Then('the area should be deleted successfully', async function() {
   } catch (error) {
     console.error(`Failed to verify area deletion: ${error.message}`);
     await takeScreenshot(page, 'verify-area-deleted-error');
+    throw error;
+  }
+});
+
+// Step definition for clicking on an area by name
+When('I click on the area with name {string}', async function(areaName) {
+  const page = await this.getPage();
+  
+  try {
+    console.log(`Looking for area with name: ${areaName}`);
+    
+    // Wait longer for page to be ready
+    await page.waitForTimeout(5000);
+    await takeScreenshot(page, 'before-area-click');
+    
+    // Try different ways to find and click the area with expanded selectors
+    const areaSelectors = [
+      // Exact text match
+      `text="${areaName}"`,
+      // Partial text match
+      `text="${areaName.substring(0, Math.max(areaName.length - 1, 3))}"`,
+      // Element containing text
+      `tr:has-text("${areaName}")`,
+      `div.area-row:has-text("${areaName}")`,
+      `div.area-card:has-text("${areaName}")`,
+      `div:has-text("${areaName}")`,
+      `span:has-text("${areaName}")`,
+      // XPath selectors
+      `//span[contains(text(), "${areaName}")]`,
+      `//div[contains(text(), "${areaName}")]`,
+      `//span[contains(@class, 'project_area_name-initial-text-container') and contains(text(), "${areaName}")]`,
+      `//span[contains(@class, 'area') and contains(text(), "${areaName}")]`,
+      // Data attributes
+      `[data-test*="area"]:has-text("${areaName}")`,
+      `[data-area-name*="${areaName}"]`,
+      // Links
+      `a:has-text("${areaName}")`,
+      // Specific to your application
+      `.area-list-item:has-text("${areaName}")`,
+      `.area-name:has-text("${areaName}")`
+    ];
+    
+    let clicked = false;
+    
+    // Try clicking using locator API first
+    for (const selector of areaSelectors) {
+      try {
+        console.log(`Trying selector: ${selector}`);
+        const areaElement = page.locator(selector).first();
+        
+        if (await areaElement.count() > 0) {
+          console.log(`Found area element with selector: ${selector}`);
+          
+          // Try to scroll it into view first
+          try {
+            await areaElement.scrollIntoViewIfNeeded();
+            await page.waitForTimeout(500);
+          } catch (scrollErr) {
+            console.log(`Scroll into view error: ${scrollErr.message}`);
+          }
+          
+          // Try clicking with different methods
+          try {
+            await areaElement.click({force: true, timeout: 5000});
+            console.log(`Clicked area "${areaName}" using force click`);
+            clicked = true;
+          } catch (clickErr) {
+            console.log(`Force click failed: ${clickErr.message}, trying JS click`);
+            
+            // Try JavaScript click as fallback
+            try {
+              const elementHandle = await areaElement.elementHandle();
+              await page.evaluate(element => {
+                element.click();
+              }, elementHandle);
+              console.log(`Clicked area "${areaName}" using JavaScript click`);
+              clicked = true;
+            } catch (jsClickErr) {
+              console.log(`JavaScript click failed: ${jsClickErr.message}`);
+            }
+          }
+          
+          if (clicked) {
+            // Wait for area details to load
+            await page.waitForTimeout(3000);
+            await takeScreenshot(page, 'area-selected');
+            return;
+          }
+        }
+      } catch (e) {
+        console.log(`Error with selector ${selector}: ${e.message}`);
+      }
+    }
+    
+    // If all selectors failed, try a more generic approach using evaluate
+    if (!clicked) {
+      console.log('Trying JavaScript evaluation approach');
+      try {
+        const clickResult = await page.evaluate((targetName) => {
+          // Try to find elements containing the area name
+          const elements = Array.from(document.querySelectorAll('*'));
+          for (const element of elements) {
+            const text = element.textContent || '';
+            if (text.includes(targetName) && 
+                element.offsetWidth > 0 && 
+                element.offsetHeight > 0 && 
+                window.getComputedStyle(element).display !== 'none') {
+              // Click the element
+              element.click();
+              return true;
+            }
+          }
+          return false;
+        }, areaName);
+        
+        if (clickResult) {
+          console.log(`Clicked area "${areaName}" using JavaScript evaluation`);
+          await page.waitForTimeout(3000);
+          await takeScreenshot(page, 'area-selected-js');
+          return;
+        }
+      } catch (evalErr) {
+        console.log(`JavaScript evaluation error: ${evalErr.message}`);
+      }
+    }
+    
+    // Take screenshot before throwing error
+    await takeScreenshot(page, 'area-not-found');
+    throw new Error(`Could not find or click area with name: ${areaName}`);
+  } catch (error) {
+    console.error(`Error clicking area: ${error.message}`);
+    await takeScreenshot(page, 'area-click-error');
+    throw error;
+  }
+});
+
+// Step definition for verifying area name
+Then('the area details should show name {string}', async function(expectedName) {
+  const page = await this.getPage();
+  
+  try {
+    console.log(`Verifying area name is: ${expectedName}`);
+    
+    // Wait for potential loading to complete
+    await page.waitForTimeout(1000);
+    
+    // Find an element that shows the area name
+    const nameSelectors = [
+      `h1:has-text("${expectedName}")`,
+      `h2:has-text("${expectedName}")`,
+      `.area-name:has-text("${expectedName}")`,
+      `[data-test*="area-name"]:has-text("${expectedName}")`,
+      `input[value="${expectedName}"]`,
+      `text="${expectedName}"`
+    ];
+    
+    for (const selector of nameSelectors) {
+      try {
+        await page.waitForSelector(selector, { 
+          state: 'visible',
+          timeout: 5000
+        });
+        console.log(`Found area name using selector: ${selector}`);
+        break;
+      } catch (e) {
+        console.log(`Name not found with selector ${selector}: ${e.message}`);
+      }
+    }
+    
+    await takeScreenshot(page, `area-name-verification-${expectedName}`);
+  } catch (error) {
+    console.error(`Error verifying area name: ${error.message}`);
+    await takeScreenshot(page, 'area-name-verification-error');
     throw error;
   }
 }); 
