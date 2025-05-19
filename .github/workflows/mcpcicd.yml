@@ -4,11 +4,20 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
 jobs:
-  setup-dependencies:
+  CheckoutAndSetup:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+  InstallDependencies:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: CheckoutAndSetup
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -23,6 +32,23 @@ jobs:
             ${{ runner.os }}-node-
       - name: Install Dependencies
         run: npm ci
+
+  InstallPlaywright:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: InstallDependencies
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
@@ -32,13 +58,37 @@ jobs:
             ${{ runner.os }}-playwright-
       - name: Install Playwright
         run: npx playwright install --with-deps
+
+  InstallMCPServer:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    needs: InstallPlaywright
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Restore cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Restore cached Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
       - name: Install Playwright MCP Server
         run: npm install @playwright/mcp@latest
 
-  pipeline-1-login-project:
-    needs: setup-dependencies
+  RunTestAndUpload:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    needs: InstallMCPServer
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -58,87 +108,13 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
-      - name: Run Login and Project Tests
-        run: |
-          set HEADLESS=true
-          npx cucumber-js features/login.feature features/project-creation.feature features/project-crud.feature --format html:cucumber-report-pipeline1.html
+      - name: Run Playwright MCP Tests
+        run: npm run mcp:headless
         env:
           HEADLESS: true
-      - name: Upload Test Artifacts - Pipeline 1
+      - name: Upload Test Artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-test-artifacts-pipeline1
-          path: cucumber-report-pipeline1.html
-
-  pipeline-2-item-export:
-    needs: setup-dependencies
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Restore cached node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Restore cached Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-      - name: Run Item and Export Tests
-        run: |
-          set HEADLESS=true
-          npx cucumber-js features/item-creation.feature features/export-spec-sheet.feature --format html:cucumber-report-pipeline2.html
-        env:
-          HEADLESS: true
-      - name: Upload Test Artifacts - Pipeline 2
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-artifacts-pipeline2
-          path: cucumber-report-pipeline2.html
-
-  pipeline-3-area:
-    needs: setup-dependencies
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Restore cached node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: Restore cached Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-      - name: Run Area Tests
-        run: |
-          set HEADLESS=true
-          npx cucumber-js features/area-crud.feature --format html:cucumber-report-pipeline3.html
-        env:
-          HEADLESS: true
-      - name: Upload Test Artifacts - Pipeline 3
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-test-artifacts-pipeline3
-          path: cucumber-report-pipeline3.html
+          name: playwright-test-artifacts
+          path: cucumber-report.html

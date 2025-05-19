@@ -192,8 +192,9 @@ async function clickNextButton(page) {
         button.textContent.toLowerCase().includes('next')
       );
       
-      if (nextButton && typeof nextButton.click === 'function') {
-        nextButton.click();
+      if (nextButton) {
+        // Use bracket notation to avoid TypeScript errors
+        nextButton['click']();
         return true;
       }
       return false;
