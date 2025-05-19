@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*"]
+    }
+  },
+  "include": [
+    "steps/**/*",
+    "features/**/*",
+    "config/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+} 

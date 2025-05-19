@@ -1,0 +1,41 @@
+{
+  "cucumberautocomplete.steps": [
+    "steps/**/*.js"
+  ],
+  "cucumberautocomplete.syncfeatures": "features/**/*.feature",
+  "cucumberautocomplete.strictGherkinCompletion": true,
+  "cucumberautocomplete.smartSnippets": true,
+  "cucumberautocomplete.stepsInvariants": true,
+  "cucumberautocomplete.customParameters": [],
+  "cucumberautocomplete.skipDocStringsFormat": true,
+  "cucumberautocomplete.formatConfOverride": {
+    "Funktionalität": 0,
+    "Grundlage": 1,
+    "Szenario": 1,
+    "Szenariogrundriss": 1,
+    "Beispiele": 2,
+    "Feature": 0,
+    "Background": 1,
+    "Scenario": 1,
+    "Scenario Outline": 1,
+    "Examples": 2,
+    "Scenario Template": 1,
+    "Rule": 1,
+    "Given": 2,
+    "When": 2,
+    "Then": 2,
+    "And": 3,
+    "But": 3,
+    "Angenommen": 2,
+    "Gegeben sei": 2,
+    "Wenn": 2,
+    "Dann": 2,
+    "Und": 3,
+    "Aber": 3
+  },
+  "editor.quickSuggestions": {
+    "comments": false,
+    "strings": true,
+    "other": true
+  }
+} 

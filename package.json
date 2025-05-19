@@ -7,13 +7,25 @@
     "cucumber": "cucumber-js",
     "mcp": "npx cucumber-js",
     "mcp:headless": "set HEADLESS=true&& npx cucumber-js",
+    "mcp:headless:run": "set HEADLESS=true&& npx cucumber-js --profile run",
+    "mcp:headless:area": "set HEADLESS=true&& npx cucumber-js --name \"Create, update, and delete an area\"",
     "mcp:headed": "set HEADLESS=false&& npx cucumber-js",
+    "mcp:headed:run": "set HEADLESS=false&& npx cucumber-js --profile run",
     "mcp:firefox": "set BROWSER=firefox&& npx cucumber-js",
     "mcp:webkit": "set BROWSER=webkit&& npx cucumber-js",
     "mcp:chrome": "set BROWSER=chromium&& npx cucumber-js",
     "mcp:login": "npx cucumber-js --tags @login",
+    "mcp:project": "npx cucumber-js --tags @project",
+    "mcp:item": "npx cucumber-js --tags @item",
     "mcp:slow": "set SLOW_MO=100&& npx cucumber-js",
-    "mcp:report": "npx cucumber-js --format html:report.html"
+    "mcp:report": "npx cucumber-js --format html:report.html",
+    "mcp:server": "node run-with-mcp-server.js",
+    "mcp:server:project": "node run-with-mcp-server.js project",
+    "mcp:server:login": "node run-with-mcp-server.js login",
+    "mcp:server:item": "node run-with-mcp-server.js item",
+    "mcp:project:crud": "npx cucumber-js features/project-crud.feature",
+    "mcp:vision": "npx cucumber-js features/Vision-crud.feature",
+    "mcp:item:crud": "npx cucumber-js features/item-crud.feature"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +34,16 @@
   "description": "",
   "devDependencies": {
     "@cucumber/cucumber": "^11.2.0",
+    "@playwright/test": "^1.52.0",
     "playwright": "^1.52.0"
+  },
+  "vscode": {
+    "extensions": {
+      "recommendations": [
+        "alexkrechik.cucumberautocomplete",
+        "cucumberopen.cucumber-official",
+        "stevejpurves.cucumber"
+      ]
+    }
   }
 }
